@@ -1,6 +1,6 @@
 # COOL Compiler Project
 
-This project is an implementation of a compiler for the COOL (Classroom Object Oriented Language) programming language. It is developed in phases, utilizing **ANTLRv4** for generating the lexer and parser, with **Java** as the host language.
+This project is a simple implementation of a compiler for the COOL (Classroom Object Oriented Language) programming language. It is developed in phases, utilizing **ANTLRv4** for generating the lexer and parser, with **Java** as the host language.
 
 ## Project Structure
 
