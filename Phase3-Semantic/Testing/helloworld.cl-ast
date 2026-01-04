@@ -1,0 +1,1 @@
+([] ([10] class Main { ([22 10] main ( ) : IO { ([49 22 10] ([8 49 22 10] new IO) . out_string ( ([193 49 22 10] "Hello world!\n") )) }) ; } ;))
