@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.*;
 public class Main {
     public static void main(String[] args) {
 
-        String inputFile = "Testing/fact.cl"; // Input file path
-        String outputFile = "Testing/output.txt"; // Output file path
+        String inputFile = (args.length > 0) ? args[0] : "Testing/fact.cl";
+        String outputFile = "Testing/output.txt"; 
 
         try {
             // Create input stream from file

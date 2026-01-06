@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String inputFile = "Testing/fact.cl";
+        String inputFile = (args.length > 0) ? args[0] : "Testing/fact.cl";
         FileWriter file = new FileWriter(inputFile + "-ast");
         BufferedWriter writer = new BufferedWriter(file);
         FileInputStream inputStream = new FileInputStream(inputFile);
@@ -21,7 +21,7 @@ public class Main {
 
         writer.close();
         System.out.println(tree.toStringTree(parser));
-        Trees.inspect(tree, parser);
+        // Trees.inspect(tree, parser);
     }
 }
 

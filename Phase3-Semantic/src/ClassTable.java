@@ -136,4 +136,17 @@ public class ClassTable {
         }
         return "Object";
     }
+
+    // Find a method in the class or its ancestors
+    public List<String> getMethodSignature(String className, String methodName) {
+        String curr = className;
+        while (curr != null) {
+            ClassNode node = classes.get(curr);
+            if (node != null && node.methods.containsKey(methodName)) {
+                return node.methods.get(methodName);
+            }
+            curr = (node != null) ? node.parentName : null;
+        }
+        return null;
+    }
 }

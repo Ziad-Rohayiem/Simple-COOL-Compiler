@@ -39,6 +39,25 @@ public class TypeChecker extends cool_syntaxBaseVisitor<String> {
         symbolTable.enterScope();
         symbolTable.add("self", "SELF_TYPE");
         
+        // Pass 1: Register all features (attributes and method signatures)
+        for (cool_syntaxParser.FeatureContext feature : ctx.feature()) {
+            if (feature instanceof cool_syntaxParser.FunctionContext) {
+                cool_syntaxParser.FunctionContext f = (cool_syntaxParser.FunctionContext) feature;
+                String methodName = f.OBJECT_IDENTIFIER().getText();
+                String returnType = f.TYPE_IDENTIFIER().getText();
+                List<String> sig = new ArrayList<>();
+                for (cool_syntaxParser.FormalContext formal : f.formal()) {
+                    sig.add(((cool_syntaxParser.ParameterContext)formal).TYPE_IDENTIFIER().getText());
+                }
+                sig.add(returnType);
+                classTable.getClass(currentClass).addMethod(methodName, sig);
+            } else if (feature instanceof cool_syntaxParser.VariableContext) {
+                cool_syntaxParser.VariableContext v = (cool_syntaxParser.VariableContext) feature;
+                classTable.getClass(currentClass).addAttribute(v.OBJECT_IDENTIFIER().getText(), v.TYPE_IDENTIFIER().getText());
+            }
+        }
+
+        // Pass 2: Type check method bodies
         for (cool_syntaxParser.FeatureContext feature : ctx.feature()) {
             visit(feature);
         }
@@ -78,7 +97,9 @@ public class TypeChecker extends cool_syntaxBaseVisitor<String> {
             paramTypes.add(paramType);
         }
         
-        classTable.getClass(currentClass).addMethod(methodName, paramTypes);
+        List<String> signature = new ArrayList<>(paramTypes);
+        signature.add(returnType);
+        classTable.getClass(currentClass).addMethod(methodName, signature);
         
         String bodyType = visit(ctx.expr());
         
@@ -429,7 +450,7 @@ public class TypeChecker extends cool_syntaxBaseVisitor<String> {
         String methodName = ctx.OBJECT_IDENTIFIER().getText();
         
         ClassNode classNode = classTable.getClass(currentClass);
-        List<String> signature = classNode.methods.get(methodName);
+        List<String> signature = classTable.getMethodSignature(currentClass, methodName);
         
         if (signature == null) {
             reportError("Undefined method " + methodName);
@@ -475,7 +496,7 @@ public class TypeChecker extends cool_syntaxBaseVisitor<String> {
             return "Object";
         }
         
-        List<String> signature = classNode.methods.get(methodName);
+        List<String> signature = classTable.getMethodSignature(objType, methodName);
         if (signature == null) {
             reportError("Undefined method " + methodName + " in class " + objType);
             return "Object";

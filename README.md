@@ -1,65 +1,97 @@
 # COOL Compiler Project
 
-This project is a simple implementation of a compiler for the COOL (Classroom Object Oriented Language) programming language. It is developed in phases, utilizing **ANTLRv4** for generating the lexer and parser, with **Java** as the host language.
+This project is a multi-phase implementation of a compiler for the **COOL (Classroom Object Oriented Language)** programming language. The compiler is built using **Java** and **ANTLRv4**.
 
-## Project Structure
+## Project Motivation
+The goal of this project is to build a fully functional compiler that translates COOL source code into executable instructions, covering lexical analysis, parsing, semantic validation, and eventually code generation.
 
-The project is organized into two main phases:
+---
 
-### Phase 1: Lexical Analysis (Lexer)
-Located in the `Phase1-Lexer` directory.
-- **Focus**: Tokenizing the input COOL source code.
-- **Key Files**:
-    - `src/cool_grammar.g4`: The ANTLR4 Lexer grammar defining tokens (keywords, identifiers, literals, operators).
-    - `src/Main.java`: The entry point that reads an input file, tokenizes it, and outputs the tokens.
+## Directory Structure
 
-### Phase 2: Syntax Analysis (Parser)
-Located in the `Phase2-Parser` directory.
-- **Focus**: building the Abstract Syntax Tree (AST) or Parse Tree from the tokens.
-- **Key Files**:
-    - `cool_grammar.g4`: The Lexer grammar.
-    - `cool_syntax.g4`: The ANTLR4 Parser grammar defining the language rules (classes, features, expressions).
-    - `src/Main.java`: The entry point that parses the input, generates a parse tree, and handles errors.
-    - `src/ErrorHandling.java`: Custom error listener for syntax errors.
+Each phase of the compiler is organized into its own directory with a consistent internal structure:
 
-### Phase 3: Semantic Analysis (Type Checker)
-Located in the `Phase3-Semantic` directory.
-- **Focus**: Validating the meaning of the program (Type Checking, Scope Analysis).
-- **Key Files**:
-    - `src/SemanticAnalyzer.java`: Orchestrates the semantic analysis passes.
-    - `src/ClassTable.java`: Manages the class hierarchy and checks for cycles/validity.
-    - `src/SymbolTable.java`: Manages variable scopes.
+```text
+PhaseX-Name/
+├── src/             # Handwritten source code and ANTLR grammars (.g4)
+├── gen/             # Generated ANTLR recognizers (excluded from Git)
+├── out/             # Compiled Java classes (excluded from Git)
+├── Testing/         # Sample .cl files for testing
+└── build.sh         # Simplified build and run script
+```
+
+> **Note:** The `gen/` and `out/` directories are not included in the repository to keep it clean. They are automatically generated and populated by the build scripts.
+
+---
+
+## Phases Overview
+
+### [Phase 1: Lexical Analysis (Lexer)](./Phase1-Lexer)
+The Lexer's job is to read the raw characters of a COOL program and group them into meaningful **tokens** (e.g., keywords like `if`, identifiers, integers, and operators).
+- **Technology**: ANTLR4 Lexer grammar (`src/cool_grammar.g4`).
+- **Output**: A list of tokens with their corresponding types (e.g., `CLASS : KEYWORD`).
+
+### [Phase 2: Syntax Analysis (Parser)](./Phase2-Parser)
+The Parser takes the tokens from Phase 1 and ensures they follow the grammatical rules of COOL. It builds a **Parse Tree** representing the structure of the program.
+- **Technology**: ANTLR4 Parser grammar (`src/cool_syntax.g4`).
+- **Key Feature**: Custom error handling for syntax errors.
+
+### [Phase 3: Semantic Analysis (Type Checker)](./Phase3-Semantic)
+The Semantic Analyzer validates the "meaning" of the code. It ensures that the program is logically sound, even if it is syntactically correct.
+- **Key Tasks**:
+    - **Class Hierarchy**: Validates that classes don't have circular inheritance.
+    - **Scope Management**: Tracks variable and method declarations.
+    - **Type Checking**: Ensures types match in assignments, method calls, and expressions (e.g., can't add an `Int` to a `String`).
+    - **LUB Calculation**: Determines the Least Upper Bound for joint types in `if` and `case` expressions.
+
+---
 
 ## Prerequisites
 
-*   **Java Development Kit (JDK)** (Version 8 or higher)
-*   **ANTLRv4**: Required to generate the Java code from the `.g4` grammar files.
-*   **IntelliJ IDEA** (Optional but recommended, as project files are included).
+To build and run this project, you need:
+- **Java Development Kit (JDK)**: Version 11 or higher recommended.
+- **Bash Environment**: (Linux, macOS, or WSL on Windows).
+- **ANTLR Jar**: The project expects the ANTLR jar to be located at `lib/antlr-4.13.1-complete.jar`.
+
+---
 
 ## How to Run
 
-### Setup
-1.  Ensure ANTLR4 libraries are added to your classpath.
-2.  Generate the ANTLR recognizers (Lexer and Parser) from the `.g4` files.
+### Running the Whole Pipeline
+You can run all three phases sequentially on a single COOL file using the root `build.sh` script:
+```bash
+chmod +x build.sh
+./build.sh Testing/fact.cl
+```
 
-### Running Phase 1: Lexical Analysis
-1.  Navigate to `Phase1-Lexer`.
-2.  Provide a COOL source file (e.g., `Testing/fact.cl`).
-3.  Run `src/Main.java`.
-4.  The output will be written to `Testing/output.txt`, listing all identified tokens.
+### Running Individual Phases
+Each phase contains its own `build.sh` script for independent testing.
 
-### Running Phase 2: Syntax Analysis
-1.  Navigate to `Phase2-Parser`.
-2.  Provide a COOL source file (e.g., `Testing/fact.cl`).
-3.  Run `src/Main.java`.
-4.  The program will parse the code and produce a parse tree string or display a graphical inspector (via `Trees.inspect`).
-5.  Output is also saved to `Testing/fact.cl-ast`.
+#### Phase 1 (Lexer)
+```bash
+cd Phase1-Lexer
+chmod +x build.sh
+./build.sh Testing/fact.cl
+```
 
-### Running Phase 3: Semantic Analysis
-1.  Navigate to `Phase3-Semantic`.
-2.  Provide a COOL source file.
-3.  Run `src/Main.java`.
-4.  It will perform Class Hierarchy checks and report any errors (cycles, undefined parents, missing Main).
+#### Phase 2 (Parser)
+```bash
+cd Phase2-Parser
+chmod +x build.sh
+./build.sh Testing/fact.cl
+```
 
-## Testing
-The `Testing` directory in each phase contains sample COOL programs (like `fact.cl`) used to verify the correctness of the lexer and parser.
+#### Phase 3 (Semantic Analyzer)
+```bash
+cd Phase3-Semantic
+chmod +x build.sh
+./build.sh Testing/simple.cl
+```
+
+---
+
+## Development Details
+
+- **ANTLR Generation**: Grammars are stored in `src/`. The build scripts run ANTLR to generate Java code into `gen/`.
+- **Compilation**: The Java compiler (`javac`) compiles both the handwritten code in `src/` and the generated code in `gen/` into the `out/` directory.
+- **Execution**: The `java` command executes the `Main` class using the `out` directory and the ANTLR jar in the classpath.
