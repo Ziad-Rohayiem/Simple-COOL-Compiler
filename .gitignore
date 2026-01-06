@@ -1,0 +1,17 @@
+# --- Build & Generated ---
+**/gen/
+**/out/
+*.class
+*.tokens
+*.interp
+
+# --- IDEs & System ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+*.swp
+
+# --- Manual Libs ---
+# We keep 'lib/' because it contains the ANTLR jar for build scripts
+!lib/antlr-4.13.1-complete.jar

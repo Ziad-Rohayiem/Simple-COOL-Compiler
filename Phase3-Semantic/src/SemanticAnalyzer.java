@@ -21,8 +21,19 @@ public class SemanticAnalyzer {
             System.exit(1);
         }
 
-        System.out.println("Semantic analysis phase 1 (Class Hierarchy) parsing complete.");
-        // Future passes: Type Checking
+        System.out.println("Semantic analysis phase 1 (Class Hierarchy) complete.");
+        
+        // Pass 2: Type Checking
+        TypeChecker typeChecker = new TypeChecker(classTable);
+        typeChecker.visit(tree);
+        
+        if (typeChecker.hasErrors()) {
+            System.err.println("Compilation halted due to type errors.");
+            System.exit(1);
+        }
+        
+        System.out.println("Semantic analysis phase 2 (Type Checking) complete.");
+        System.out.println("All semantic checks passed successfully!");
     }
 }
 
