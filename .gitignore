@@ -1,16 +1,16 @@
 # --- Build & Generated ---
 **/gen/
 **/out/
-*.class
-*.tokens
-*.interp
+**/*.class
+**/*.tokens
+**/*.interp
 
 # --- IDEs & System ---
-.idea/
-.vscode/
-*.iml
-.DS_Store
-*.swp
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.DS_Store
+**/*.swp
 
 # --- Manual Libs ---
 # We keep 'lib/' because it contains the ANTLR jar for build scripts
